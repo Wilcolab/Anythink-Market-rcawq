@@ -163,7 +163,9 @@ router.get("/:item", auth.optional, function (req, res, next) {
   Promise.all([
     req.payload ? User.findById(req.payload.id) : null,
     req.item.populate("seller").execPopulate(),
-    req.query.title ? Item.find({ title: req.query.title }) : null,
+    req.query.title
+      ? Item.find({ title: { $regex: new RegExp(req.query.title) } })
+      : null,
   ])
     .then(function (results) {
       var user = results[0];
