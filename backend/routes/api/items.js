@@ -109,13 +109,17 @@ router.get("/feed", auth.required, function(req, res, next) {
     offset = req.query.offset;
   }
 
+  if (typeof req.query.title !== "undefined") {
+    title = req.query.title;
+  }
+
   User.findById(req.payload.id).then(function(user) {
     if (!user) {
       return res.sendStatus(401);
     }
 
     Promise.all([
-      Item.find({ seller: { $in: user.following } })
+      Item.find({ seller: { $in: user.following }, title: { $contains: title } })
         .limit(Number(limit))
         .skip(Number(offset))
         .populate("seller")
